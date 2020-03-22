@@ -13,8 +13,8 @@ Play generated sine wave sound with Python and Sounddevice module
 | PgDn | Octave - 1 |
 | Up | Current frequency + 1% |
 | Down | Current frequency - 1% |
-| --- | --- |
-| F1-F12 | Piano note eys: |
+
+| F1-F12 | Piano note keys: |
 | --- | --- |
 | F1 | C |
 | F2 | C# |
@@ -28,7 +28,7 @@ Play generated sine wave sound with Python and Sounddevice module
 | F10 | A |
 | F11 | A# |
 | F12 | B |
-| --- | --- |
+
 | Play single named note |
 | --- | --- |
 | D | D |
