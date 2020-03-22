@@ -6,7 +6,7 @@ import msvcrt
 
 # --- globals
 
-DEBUG = True
+DEBUG = False
 samplerate = 44100
 frequency  = 100
 oldfreq    = frequency
@@ -27,23 +27,21 @@ notestd = {
 	'C' : 261.6256,
 }
 notes = notestd.copy()
-notemul = 2 ** (1/12)
-pianokeys = {
-	59  : notestd['C'],
-	60  : notestd['C'] * notemul, # C#
-	61  : notestd['D'],
-	62  : notestd['D'] * notemul, # D#,
-	63  : notestd['E'],
-	64  : notestd['F'],
-	65  : notestd['F'] * notemul, # F#,
-	66  : notestd['G'],
-	67  : notestd['G'] * notemul, # G#,
-	68  : notestd['A'],
-	133 : notestd['A'] * notemul, # A#,
-	134 : notestd['B'],
-}
 
 # --- procs
+
+def get_piano_notes(octave):
+	pkeys = {}
+	baseA = 55.0 * 2 ** (octave - 1)
+	for k in [59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 133, 134]:
+		if k < 68:
+			pkeys[k] = baseA * 2 ** ((k - 68)/12) 
+		elif k == 68:
+			pkeys[k] = baseA	# note A4
+		else:
+			pkeys[k] = baseA * 2 ** ((k - 132)/12)	
+	return pkeys
+
 
 def callback(outdata, frames, t, status):
 	global start_idx, frequency, oldfreq
@@ -86,7 +84,7 @@ def helpmsg():
 
 pprint = print; print = lambda *args, **kwargs : pprint(flush=True, *args, **kwargs)
 helpmsg()
-
+pianokeys = get_piano_notes(octavenum)
 # --- main cycle
 
 with sd.OutputStream(channels=channels, callback=callback, samplerate=samplerate):
@@ -131,7 +129,14 @@ with sd.OutputStream(channels=channels, callback=callback, samplerate=samplerate
 					frequency /= 1.01
 				elif DEBUG: 
 					print("Special key '{}' pressed".format(key))
-			elif key != 255:
-				if DEBUG: print("key={}, key|0x20={}, key&0xDF={}".format(key, key|0x20, key&0xDF))
+				if key in [73, 81]:
+					if octavenum == 4:
+						notes = notestd.copy()
+					pianokeys = get_piano_notes(octavenum)
+			if key != 255:
+				if DEBUG: 
+					print("key={}, key|0x20={}, key&0xDF={}".format(key, key|0x20, key&0xDF))
+				if frequency != oldfreq or key in [ord('+'), ord('-')]:
+					print("Freq={:5.4f} Octave={:1} Volume={:3.1f}%".format(frequency, octavenum, amplitude * 100))
 		sd.sleep(10)
 		

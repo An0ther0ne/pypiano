@@ -1,6 +1,8 @@
 # pypiano
 
-Play generated sine wave sound with Python and Sounddevice module
+Play generated sine wave sound with Python and Sounddevice module.
+Initialy octave number is 4.
+Initialy sound 
 
 ## Control keys:
 
@@ -14,30 +16,37 @@ Play generated sine wave sound with Python and Sounddevice module
 | Up | Current frequency + 1% |
 | Down | Current frequency - 1% |
 
-| F1-F12 | Piano note keys: |
-| --- | --- |
-| F1 | C |
-| F2 | C# |
-| F3 | D |
-| F4 | D# |
-| F5 | E |
-| F6 | F |
-| F7 | F# |
-| F8 | G |
-| F9 | G# |
-| F10 | A |
-| F11 | A# |
-| F12 | B |
+## Piano mapped keys:
 
-| Play single named note |
+Note: The frequencies are listed for the fourth octave.
+
+| Key | Piano note | Frequency |
 | --- | --- |
-| D | D |
-| A | A |
-| C | C |
-| E | E |
-| F | F |
-| B | B |
-| G | G |
+| F1 | C | 261.6256
+| F2 | C# |
+| F3 | D | 293.6648
+| F4 | D# |
+| F5 | E | 329.6276
+| F6 | F | 349.2282
+| F7 | F# |
+| F8 | G | 391.995
+| F9 | G# |
+| F10 | A | 440.0
+| F11 | A# |
+| F12 | B | 493.8833
+
+## Directly named
+
+| Key | Note | Frequency, Hz |
+| --- | --- | --- |
+| D | D | 293.6648 |
+| A | A | 440.0 | 
+| C | C | 261.6256 |
+| E | E | 329.6276 |
+| F | F | 349.2282 |
+| B | B | 493.8833 |
+| G | G | 391.995 |
+
 
 ## Requirements:
 
