@@ -62,7 +62,7 @@ Note: The frequencies are listed for the fourth octave.
 
 ## Video demo
 
-[![Youtube video](img/pypiano.png)](https://www.youtube.com/embed/-wZeW_NdPNw)
+[![Youtube video](img/pypianoy.png)](https://www.youtube.com/embed/-wZeW_NdPNw)
 
 ## Requirements:
 
