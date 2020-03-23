@@ -8,7 +8,7 @@ Play generated wave sound with Python and Sounddevice module.
 * Initialy sound frequency is 100 Hz.
 * Special algorithm for seamless frequency transition and noise reduction
 * Use callback procedure for directly calculate sound waveform
-* Sine, square or triangle saw waveforms
+* Sine, square, saw or triangle waveforms
 
 ## Used keys:
 
@@ -23,9 +23,10 @@ Play generated wave sound with Python and Sounddevice module.
 | PgDn | Octave - 1 |
 | Up | Current frequency + 1% |
 | Down | Current frequency - 1% |
-| [ ] | Square wave form
-| ~ | Sine wave form
-| < > | Triangle wave form
+| [ ] | Square wave form |
+| ~ | Sine wave form |
+| < > | Triangle waveform |
+| / | Saw waveform |
 
 ### Piano mapped keys:
 

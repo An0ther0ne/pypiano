@@ -46,11 +46,23 @@ def sine(freq, frames):
 	return amplitude * np.sin(2 * np.pi * freq * frames())
 	
 def square(freq, frames):
-	w = frames().reshape(-1)
-	w = 2 * freq * w
-	w = w.astype(int)
-	ww = np.where(w % 2 == 0, amplitude, -amplitude)
-	return ww.reshape(-1,1)
+	w = (2 * freq * frames().reshape(-1)).astype(int)
+	return np.where(w % 2 == 0, amplitude, -amplitude).reshape(-1,1)
+
+def saw(freq, frames):
+	w = (2 * freq * frames()) % 2
+	w = (w * 2 - 1) * amplitude / 2
+	return w
+	
+def triangle(freq, frames):
+	f  = 2 * freq * frames()
+	fm = 0
+	for fi,fv in enumerate(f):
+		fm += 1 if np.cos(np.pi * fv) >= 0 else -1
+		f[fi] = fm
+	f -= f.mean()
+	f /= f.max()
+	return amplitude * f
 
 def callback(outdata, frames, t, status):
 	global start_idx, frequency, oldfreq
@@ -102,6 +114,8 @@ pianokeys = get_piano_notes(octavenum)
 waveforms = {
 	0 : ['Sine'  , sine],
 	1 : ['Square', square],
+	2 : ['Saw',    saw],
+	3 : ['Three',  triangle],
 }
 wformnum = 0
 wave = waveforms[wformnum][1]
@@ -120,11 +134,15 @@ with sd.OutputStream(channels=channels, callback=callback, samplerate=samplerate
 					amplitude = 1
 			elif key == ord('-'):
 				amplitude /= 1.25
-			elif key in [91, 93, 96]: 	# []~
+			elif key in [44, 46, 47, 91, 93, 96]: 	# []~
 				if key in [91,93]:		# []
 					wformnum = 1
+				elif key in [44,46]:
+					wformnum = 2
 				elif key == 96:			# ~
 					wformnum = 0
+				elif key == 47:			# /
+					wformnum = 3
 				wave = waveforms[wformnum][1]
 			elif chr(key & 0xDF) in notes.keys():
 				frequency = notes[chr(key & 0xDF)]
