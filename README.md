@@ -9,7 +9,9 @@ Play generated wave sound with Python and Sounddevice module.
 * Special algorithm for seamless frequency transition and noise reduction
 * Use callback procedure for directly calculate sound wave form
 
-## Control keys:
+## Used keys:
+
+### For control
 
 | Key | Desctiption |
 | --- | --- |
@@ -21,7 +23,7 @@ Play generated wave sound with Python and Sounddevice module.
 | Up | Current frequency + 1% |
 | Down | Current frequency - 1% |
 
-## Piano mapped keys:
+### Piano mapped keys:
 
 Note: The frequencies are listed for the fourth octave.
 
@@ -40,7 +42,7 @@ Note: The frequencies are listed for the fourth octave.
 | F11 | A# | 466.1638 |
 | F12 | B | 493.8833 |
 
-## Directly named
+### Directly named
 
 | Key | Note | Frequency, Hz |
 | --- | --- | --- |
