@@ -7,7 +7,8 @@ Play generated wave sound with Python and Sounddevice module.
 * Initialy octave number is 4.
 * Initialy sound frequency is 100 Hz.
 * Special algorithm for seamless frequency transition and noise reduction
-* Use callback procedure for directly calculate sound wave form
+* Use callback procedure for directly calculate sound waveform
+* Sine, square or triangle saw waveforms
 
 ## Used keys:
 
