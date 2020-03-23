@@ -45,20 +45,20 @@ def get_piano_notes(octave):
 
 def callback(outdata, frames, t, status):
 	global start_idx, frequency, oldfreq
-	tt = (start_idx + np.arange(frames)) / samplerate
-	tt = tt.reshape(-1, 1)
+	def getsounddata(freq, tfrom, tto, idx):
+		def getframes():
+			tt = (idx + np.arange(tfrom - tto)) / samplerate
+			return tt.reshape(-1, 1)
+		return amplitude * np.sin(2 * np.pi * freq * getframes())
 	if oldfreq == frequency:
-		outdata[:] = amplitude * np.sin(2 * np.pi * frequency * tt)
-		# start_idx = (start_idx + frames) % samplerate
+		outdata[:] = getsounddata(frequency, frames, 0, start_idx)
 		start_idx = (start_idx + frames) % (samplerate / frequency)
 	else: # for seamless frequency transition and noise reduction 
-		data = amplitude * np.sin(2 * np.pi * oldfreq * tt)
+		data = getsounddata(oldfreq, frames, 0, start_idx)
 		for i,v in enumerate(data):
 			if i > 0 and v < 0 and v > -0.01 and (v - data[i-1]) > 0:
-				tt = np.arange(frames - i) / samplerate
-				tt = tt.reshape(-1, 1)
 				start_idx = frames - i
-				data[i:] = amplitude * np.sin(2 * np.pi * frequency * tt)
+				data[i:] = getsounddata(frequency, frames, i, 0)
 				break
 		outdata[:] = data
 		oldfreq = frequency

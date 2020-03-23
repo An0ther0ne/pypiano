@@ -27,7 +27,7 @@ Play generated wave sound with Python and Sounddevice module.
 
 Note: The frequencies are listed for the fourth octave.
 
-| Key | Piano note | Frequency |
+| Key | Piano note | Frequency, Hz |
 | --- | --- | --- |
 | F1 | C | 261.6256 |
 | F2 | C# | 277.1826 |
