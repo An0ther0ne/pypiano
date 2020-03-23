@@ -99,8 +99,7 @@ def helpmsg():
 '[' | ']'  : Square waveform
 '~'        : Sine waveform
 '<' | '>'  : Triangle waveform
-'/'        : Saw waveform
-''')
+'/'        : Saw waveform''')
 	print('-' * 80)
 	print("'F1'-'F12' : Piano keys: C C# D D# E F F# G G# A A# B")
 	print('-' * 80)
