@@ -2,6 +2,10 @@
 
 Play generated wave sound with Python and Sounddevice module.
 
+## Video demo
+
+[![Youtube video](img/pypianoy.png)](https://www.youtube.com/embed/-wZeW_NdPNw)
+
 ## Features:
 
 * Initialy octave number is 4.
@@ -59,10 +63,6 @@ Note: The frequencies are listed for the fourth octave.
 | F | F | 349.2282 |
 | B | B | 493.8833 |
 | G | G | 391.995 |
-
-## Video demo
-
-[![Youtube video](img/pypianoy.png)](https://www.youtube.com/embed/-wZeW_NdPNw)
 
 ## Requirements:
 
