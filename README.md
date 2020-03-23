@@ -21,7 +21,7 @@ Initialy sound
 Note: The frequencies are listed for the fourth octave.
 
 | Key | Piano note | Frequency |
-| --- | --- |
+| --- | --- | --- |
 | F1 | C | 261.6256 |
 | F2 | C# | 277.1826 |
 | F3 | D | 293.6648 |
