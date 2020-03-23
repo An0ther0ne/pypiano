@@ -69,6 +69,7 @@ Note: The frequencies are listed for the fourth octave.
 ## Files:
 	
 * [pypianostxt.py](pypianostxt.py) - Text mode sine wave generator
+* [waveform.py](waveform.py) - Simple GUI tool for watch sound waveform with matplotlib
 * README.md - This readme file
 * LICENSE - MIT LICENSE
 
