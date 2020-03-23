@@ -9,6 +9,7 @@ Play generated wave sound with Python and Sounddevice module.
 * Special algorithm for seamless frequency transition and noise reduction
 * Use callback procedure for directly calculate sound waveform
 * Sine, square, saw or triangle waveforms
+* Additional tools for watch form and spectrum audio signal
 
 ## Used keys:
 
@@ -70,6 +71,7 @@ Note: The frequencies are listed for the fourth octave.
 	
 * [pypianostxt.py](pypianostxt.py) - Text mode sine wave generator
 * [waveform.py](waveform.py) - Simple GUI tool for watch sound waveform with matplotlib
+* [spectrogram.py](spectrogram.py) - Simple spectrogram tool like fire uses opencv
 * README.md - This readme file
 * LICENSE - MIT LICENSE
 
