@@ -13,7 +13,7 @@ Play generated wave sound with Python and Sounddevice module.
 
 ### For control
 
-| Key | Desctiption |
+| Keys | Desctiption |
 | --- | --- |
 | ESC | Exit |
 | + | Increase volume |
@@ -22,6 +22,9 @@ Play generated wave sound with Python and Sounddevice module.
 | PgDn | Octave - 1 |
 | Up | Current frequency + 1% |
 | Down | Current frequency - 1% |
+| [ ] | Square wave form
+| ~ | Sine wave form
+| < > | Triangle wave form
 
 ### Piano mapped keys:
 
