@@ -85,7 +85,11 @@ def helpmsg():
 pprint = print; print = lambda *args, **kwargs : pprint(flush=True, *args, **kwargs)
 helpmsg()
 pianokeys = get_piano_notes(octavenum)
+
 # --- main cycle
+
+for k in sorted(pianokeys.keys()):
+	print('{} {}'.format(k, pianokeys[k]))
 
 with sd.OutputStream(channels=channels, callback=callback, samplerate=samplerate):
 	while True:
