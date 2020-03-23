@@ -94,11 +94,13 @@ def helpmsg():
 'PgDn'     : Octave - 1")
 'Up'       : Current frequency + 1%")
 'Down'     : Current frequency - 1%")
-'Home'     : Next wave form
-'End'	   : Previous wave form
-'[' | ']'  : Square wave form
-'~'        : Sine wave form
-'<' | '>'  : Triangle wave form''')
+'Home'     : Next waveform
+'End'	   : Previous waveform
+'[' | ']'  : Square waveform
+'~'        : Sine waveform
+'<' | '>'  : Triangle waveform
+'/'        : Saw waveform
+''')
 	print('-' * 80)
 	print("'F1'-'F12' : Piano keys: C C# D D# E F F# G G# A A# B")
 	print('-' * 80)
