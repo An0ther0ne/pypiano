@@ -6,7 +6,7 @@ import msvcrt
 
 # --- globals
 
-DEBUG = True
+DEBUG = False
 samplerate = 44100
 frequency  = 100
 oldfreq    = frequency
@@ -55,14 +55,7 @@ def saw(freq, frames):
 	return w
 	
 def triangle(freq, frames):
-	f  = 2 * freq * frames()
-	fm = 0
-	for fi,fv in enumerate(f):
-		fm += 1 if np.cos(np.pi * fv) >= 0 else -1
-		f[fi] = fm
-	f -= f.mean()
-	f /= f.max()
-	return amplitude * f
+	return 2 * amplitude * np.arcsin(np.sin(2 * np.pi * freq * frames())) / np.pi
 
 def callback(outdata, frames, t, status):
 	global start_idx, frequency, oldfreq
