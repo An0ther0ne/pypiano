@@ -14,7 +14,7 @@ amplitude   = 0.5
 channels    = 2
 start_idx   = 0
 octavenum   = 4
-attenuate   = True
+attenuateex = 0.9		# attenuation factor (multiplier)
 attenuation = False
 
 # --- notes
@@ -30,6 +30,89 @@ notestd = {
 }
 notes = notestd.copy()
 
+# --- classes
+
+class Wave:
+	_amplitude = 0.5
+	_frequency = 77.7
+	_waveformnum = 0
+	def _set_amplitude(self, a):
+		if a > 0 and a < 1: 
+			self._amplitude = a
+	def _sine(self):
+		pass
+	def _square(self):
+		pass
+	def _saw(self):
+		pass
+	def _triangle(self):
+		pass
+	def _trapeze(self):
+		pass
+	def _triangle(self):
+		pass	
+	_waveforms = {
+		0 : _sine,
+		1 : _square,
+		2 : _saw,
+		3 : _triangle,
+		4 : _trapeze,
+	}
+	def NextWaveForm(self):
+		self._waveformnum = (self._waveformnum + 1) % len(self._waveforms)
+		self.wave =	self._waveforms[self._waveformnum]
+	def PrevWaveForm(self):
+		self._waveformnum = (self._waveformnum - 1) % len(self._waveforms)
+		self.wave =	self._waveforms[self._waveformnum]
+	amplitude = property(lambda self : self._amplitude, _set_amplitude)
+	wave = property(lambda self : _waveforms[_waveformnum])
+
+class Octave:
+	_gamma     = "C Cs D Ds E F Fs G Gs A As B".split()
+	_scancodes = [59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 133, 134] # F1 - F12
+	_octavenum = 4
+	def _recalc(self):
+		baseA = 55.0 * 2 ** (self._octavenum - 1)
+		for num, note in enumerate(self._gamma):
+			self._notesfreq[note] = baseA * 2 ** ((num - 9) / 12)
+	def __init__(self):
+		self._notesfreq = {}
+		self._recalc()
+	def Next(self):
+		if self._octavenum < 9:
+			self._octavenum += 1
+			self._recalc()
+	def Prev(self):
+		if self._octavenum > 1:
+			self._octavenum -= 1
+			self._recalc()
+	def Set(self, num):
+		if num > 0 and num < 10:
+			self._octavenum = num
+			self._recalc()
+	def GetNote(self, note):
+		if note in self._gamma:
+			return self._notesfreq[note]
+		else:
+			return None
+	def GetNoteNum(self, num):
+		if num >= 0 and num < 12:
+			return self._notesfreq[self._gamma[num]]
+		else:
+			return None
+		
+class Note(Wave):
+	def __init__(self, fr, at, wf):	# freequency, attenuation, waveform
+		self._frequency  = fr
+		self._attenuation = at
+		self._waveformnum  = wf
+	def PlayFreq(self, freq):
+		pass
+	def PlayNoteByName(self, NoteName):
+		pass
+	def PlayNoteByNum(self, NoteNum):
+		pass
+
 # --- procs
 
 def get_piano_notes(octave):
@@ -43,26 +126,21 @@ def get_piano_notes(octave):
 		else:
 			pkeys[k] = baseA * 2 ** ((k - 132)/12)	
 	return pkeys
-
-def getamplitude(frames):
-	global attenuate
+	
+def getamplitude(freq, frames):
 	if attenuation:
-		if attenuate:
-			attenuate = False
-			amp = np.linspace(amplitude, 0, num=len(frames))
-		else:
-			amp = np.zeros((len(frames)), dtype="uint8")
+		amp = np.linspace(amplitude, amplitude, num=len(frames))
 	else:
 		amp = np.linspace(amplitude, amplitude, num=len(frames))
 	return amp.reshape(-1,1)
 
 def sine(freq, frames):
 	f = frames()
-	return getamplitude(f) * np.sin(2 * np.pi * freq * f)
+	return getamplitude(freq, f) * np.sin(2 * np.pi * freq * f)
 	
 def square(freq, frames):
 	f = frames()
-	amp = getamplitude(f)
+	amp = getamplitude(freq, f)
 	w = (2 * freq * f).astype(int)
 	ww = w.astype(float)
 	for i,v in enumerate(w):
@@ -75,20 +153,20 @@ def square(freq, frames):
 def saw(freq, frames):
 	f = frames()
 	w = (2 * freq * f) % 2
-	w = (w * 2 - 1) * getamplitude(f) / 2
+	w = (w * 2 - 1) * getamplitude(freq, f) / 2
 	return w
 	
 def triangle(freq, frames):
 	f = frames()
-	return 2 * getamplitude(f) * np.arcsin(np.sin(2 * np.pi * freq * f)) / np.pi
+	return 2 * getamplitude(freq, f) * np.arcsin(np.sin(2 * np.pi * freq * f)) / np.pi
 
 def trapeze(freq, frames):
 	f = frames()
 	t = np.arcsin(np.sin(2 * np.pi * freq * f))
-	return getamplitude(f) * np.where(t > 1, 1, np.where(t < -1, -1, t))
+	return getamplitude(freq, f) * np.where(t > 1, 1, np.where(t < -1, -1, t))
 
 def callback(outdata, frames, t, status):
-	global start_idx, frequency, oldfreq, attenuate
+	global start_idx, frequency, oldfreq
 	def getsounddata(freq, tfrom, tto, idx):
 		def getframes():
 			tt = (idx + np.arange(tfrom - tto)) / samplerate
@@ -99,7 +177,6 @@ def callback(outdata, frames, t, status):
 		start_idx = (start_idx + frames) % (samplerate / frequency)
 	else: # for seamless frequency transition and noise reduction 
 		data = getsounddata(oldfreq, frames, 0, start_idx)
-		attenuate = True
 		for i,v in enumerate(data):
 			if i > 0 and v < 0 and v > -0.01 and (v - data[i-1]) > 0:
 				start_idx = frames - i
