@@ -95,7 +95,37 @@ class Wave:
 	channels = property(lambda self : _channels)
 	samplerate = property(lambda self : _samplerate)
 
+class Note(Wave):
+	def __init__(self, fr, at, wf):	# freequency, attenuation, waveform
+		self._frequency  = fr
+		self._attenuation = at
+		self._waveformnum  = wf
+	def _play(self):
+		Wave.Play()
+	def PlayFreq(self, freq):
+		self._frequency = freq
+	def PlayNoteByName(self, NoteName):
+		pass
+	def PlayNoteByNum(self, NoteNum):
+		pass
+
 class Octave:
+	'''Controll keys:
+'ESC'      : Exit
+'Tab'      : Toggle attenuation
+'+'        : Increase volume by 25%
+'-'        : Decrease volume by 25%
+'PgUp'     : Octave + 1
+'PgDn'     : Octave - 1
+'Up'       : Current frequency + 1%
+'Down'     : Current frequency - 1%
+'Home'     : Next waveform
+'End'	   : Previous waveform
+'[' | ']'  : Square waveform
+'~'        : Sine waveform
+'<' | '>'  : Triangle waveform
+'/'        : Saw waveform
+'='        : Trapeze waveform'''
 	_gamma     = "C Cs D Ds E F Fs G Gs A As B".split()
 	_scancodes = [59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 133, 134] # F1 - F12
 	_octavenum = 4
@@ -130,26 +160,19 @@ class Octave:
 			return None
 	def __str__(self):
 		return reduce(
-			lambda i,j : "{}'{}'\t   : Play note {}\n".format(i,j,j), 
-			filter(lambda x : len(x) == 1, self._gamma), 
-			''
-		)
-				
+			lambda i,j : i + ['', "\n"][len(i) > 0] + "'{}'\t   : Play note {}".format(j,j),
+			filter(lambda x : len(x) == 1, self._gamma),
+			'')
+	def HelpMsg(self):
+		print('#' * 80)
+		print(self.__doc__)
+		print('-' * 80)
+		print("'F1'-'F12' : Piano keys:", 
+			reduce(lambda i,j : i + ' ' + j, self._gamma).replace('s','#'))
+		print('-' * 80)
+		print(self)
+		print('#' * 80)		
 		
-class Note(Wave):
-	def __init__(self, fr, at, wf):	# freequency, attenuation, waveform
-		self._frequency  = fr
-		self._attenuation = at
-		self._waveformnum  = wf
-	def _play(self):
-		Wave.Play()
-	def PlayFreq(self, freq):
-		self._frequency = freq
-	def PlayNoteByName(self, NoteName):
-		pass
-	def PlayNoteByNum(self, NoteNum):
-		pass
-
 # --- procs
 
 def get_piano_notes(octave):
@@ -221,37 +244,16 @@ def callback(outdata, frames, t, status):
 				break
 		oldfreq = frequency
 	outdata[:] = data
-	
-	
-def helpmsg():
-	print('#' * 80)
-	print('''Controll keys:
-'ESC'      : Exit
-'Tab'      : Toggle attenuation
-'+'        : Increase volume by 25%
-'-'        : Decrease volume by 25%
-'PgUp'     : Octave + 1
-'PgDn'     : Octave - 1
-'Up'       : Current frequency + 1%
-'Down'     : Current frequency - 1%
-'Home'     : Next waveform
-'End'	   : Previous waveform
-'[' | ']'  : Square waveform
-'~'        : Sine waveform
-'<' | '>'  : Triangle waveform
-'/'        : Saw waveform
-'='        : Trapeze waveform''')
-	print('-' * 80)
-	print("'F1'-'F12' : Piano keys: C C# D D# E F F# G G# A A# B")
-	print('-' * 80)
-	for k in notes.keys():
-		print("'{}'        : Play note {}".format(k,k))
-	print('#' * 80)
-	
+
 # --- decorate print and other initialisation
 
 pprint = print; print = lambda *args, **kwargs : pprint(flush=True, *args, **kwargs)
-helpmsg()
+
+# --- implementation
+
+octave = Octave()
+octave.HelpMsg()
+	
 pianokeys = get_piano_notes(octavenum)
 waveforms = {
 	0 : ['Sine'  , sine],
@@ -262,11 +264,6 @@ waveforms = {
 }
 wformnum = 0
 wave = waveforms[wformnum][1]
-
-# --- implementation
-
-octave = Octave()
-print(octave)
 
 # --- main cycle
 
