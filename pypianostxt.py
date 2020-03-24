@@ -33,9 +33,13 @@ notes = notestd.copy()
 # --- classes
 
 class Wave:
+	_samplerate  = 44100
+	_channels = 2
 	_amplitude = 0.5
 	_frequency = 77.7
+	_oldfreq = _frequency
 	_waveformnum = 0
+	_start_idx = 0
 	def _set_amplitude(self, a):
 		if a > 0 and a < 1: 
 			self._amplitude = a
@@ -58,14 +62,37 @@ class Wave:
 		3 : _triangle,
 		4 : _trapeze,
 	}
+	def _callback(outdata, frames, t, status):
+		def getsounddata(freq, tfrom, tto, idx):
+			def getframes():
+				tt = (idx + np.arange(tfrom - tto)) / self._samplerate
+				return tt.reshape(-1, 1)
+			return wave(freq, getframes)
+		if self._oldfreq == self._frequency:
+			data = getsounddata(self._frequency, frames, 0, self._start_idx)
+			self._start_idx = (self._start_idx + frames) % (self._samplerate / self._frequency)
+		else: # for seamless frequency transition and noise reduction 
+			data = getsounddata(self._oldfreq, frames, 0, self._start_idx)
+			for i,v in enumerate(data):
+				if i > 0 and v < 0 and v > -0.01 and (v - data[i-1]) > 0:
+					self._start_idx = frames - i
+					data[i:] = getsounddata(self._frequency, frames, i, 0)
+					break
+			self._oldfreq = self._frequency
+		outdata[:] = data
 	def NextWaveForm(self):
 		self._waveformnum = (self._waveformnum + 1) % len(self._waveforms)
 		self.wave =	self._waveforms[self._waveformnum]
 	def PrevWaveForm(self):
 		self._waveformnum = (self._waveformnum - 1) % len(self._waveforms)
 		self.wave =	self._waveforms[self._waveformnum]
+	def Play(self):
+		pass
 	amplitude = property(lambda self : self._amplitude, _set_amplitude)
 	wave = property(lambda self : _waveforms[_waveformnum])
+	callback = property(lambda self : _callback)
+	channels = property(lambda self : _channels)
+	samplerate = property(lambda self : _samplerate)
 
 class Octave:
 	_gamma     = "C Cs D Ds E F Fs G Gs A As B".split()
@@ -106,8 +133,10 @@ class Note(Wave):
 		self._frequency  = fr
 		self._attenuation = at
 		self._waveformnum  = wf
+	def _play(self):
+		Wave.Play()
 	def PlayFreq(self, freq):
-		pass
+		self._frequency = freq
 	def PlayNoteByName(self, NoteName):
 		pass
 	def PlayNoteByNum(self, NoteNum):
