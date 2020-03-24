@@ -73,16 +73,19 @@ def square(freq, frames):
 	return ww.reshape(-1,1)
 
 def saw(freq, frames):
-	w = (2 * freq * frames()) % 2
-	w = (w * 2 - 1) * amplitude / 2
+	f = frames()
+	w = (2 * freq * f) % 2
+	w = (w * 2 - 1) * getamplitude(f) / 2
 	return w
 	
 def triangle(freq, frames):
-	return 2 * amplitude * np.arcsin(np.sin(2 * np.pi * freq * frames())) / np.pi
+	f = frames()
+	return 2 * getamplitude(f) * np.arcsin(np.sin(2 * np.pi * freq * f)) / np.pi
 
 def trapeze(freq, frames):
-	t = np.arcsin(np.sin(2 * np.pi * freq * frames()))
-	return amplitude * np.where(t > 1, 1, np.where(t < -1, -1, t))
+	f = frames()
+	t = np.arcsin(np.sin(2 * np.pi * freq * f))
+	return getamplitude(f) * np.where(t > 1, 1, np.where(t < -1, -1, t))
 
 def callback(outdata, frames, t, status):
 	global start_idx, frequency, oldfreq, attenuate
