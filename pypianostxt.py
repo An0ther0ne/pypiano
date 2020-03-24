@@ -3,6 +3,7 @@
 import numpy as np
 import sounddevice as sd
 import msvcrt
+from functools import reduce
 
 # --- globals
 
@@ -127,6 +128,13 @@ class Octave:
 			return self._notesfreq[self._gamma[num]]
 		else:
 			return None
+	def __str__(self):
+		return reduce(
+			lambda i,j : "{}'{}'\t   : Play note {}\n".format(i,j,j), 
+			filter(lambda x : len(x) == 1, self._gamma), 
+			''
+		)
+				
 		
 class Note(Wave):
 	def __init__(self, fr, at, wf):	# freequency, attenuation, waveform
@@ -254,6 +262,11 @@ waveforms = {
 }
 wformnum = 0
 wave = waveforms[wformnum][1]
+
+# --- implementation
+
+octave = Octave()
+print(octave)
 
 # --- main cycle
 
