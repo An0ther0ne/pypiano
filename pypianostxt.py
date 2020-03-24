@@ -41,9 +41,12 @@ class Wave:
 	_oldfreq = _frequency
 	_waveformnum = 0
 	_start_idx = 0
+	_attenuation = False
 	def _set_amplitude(self, a):
 		if a > 0 and a < 1: 
 			self._amplitude = a
+	def _change_attenuation(self, v):
+		self._attenuation = not self._attenuation
 	def _sine(self):
 		pass
 	def _square(self):
@@ -94,20 +97,22 @@ class Wave:
 	callback = property(lambda self : _callback)
 	channels = property(lambda self : _channels)
 	samplerate = property(lambda self : _samplerate)
+	attenuation = property(lambda self : _attenuation, _change_attenuation)
 
 class Note(Wave):
-	def __init__(self, fr, at, wf):	# freequency, attenuation, waveform
-		self._frequency  = fr
-		self._attenuation = at
-		self._waveformnum  = wf
+	def __init__(self, octave):
+		self._octaveref = octave		# reference to octave obj
 	def _play(self):
 		Wave.Play()
 	def PlayFreq(self, freq):
 		self._frequency = freq
+		self._play()
 	def PlayNoteByName(self, NoteName):
-		pass
+		self._frequency = self._octaveref.GetNote(NoteName)
+		self._play()
 	def PlayNoteByNum(self, NoteNum):
-		pass
+		self._frequency = self._octaveref.GetNoteNum(NoteNum)
+		self._play()
 
 class Octave:
 	'''Controll keys:
@@ -129,6 +134,7 @@ class Octave:
 	_gamma     = "C Cs D Ds E F Fs G Gs A As B".split()
 	_scancodes = [59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 133, 134] # F1 - F12
 	_octavenum = 4
+	_currentnote = None
 	def _recalc(self):
 		baseA = 55.0 * 2 ** (self._octavenum - 1)
 		for num, note in enumerate(self._gamma):
@@ -136,6 +142,7 @@ class Octave:
 	def __init__(self):
 		self._notesfreq = {}
 		self._recalc()
+		self._currentnote = Note(self)	# last 'self' passed to Note obj as reference to octave
 	def Next(self):
 		if self._octavenum < 9:
 			self._octavenum += 1
