@@ -6,11 +6,11 @@ import msvcrt
 
 # --- globals
 
-DEBUG = False
+DEBUG = True
 samplerate = 44100
-frequency  = 100
+frequency  = 77.7
 oldfreq    = frequency
-amplitude  = 0.1
+amplitude  = 0.5
 channels   = 2
 start_idx  = 0
 octavenum  = 4
@@ -57,6 +57,10 @@ def saw(freq, frames):
 def triangle(freq, frames):
 	return 2 * amplitude * np.arcsin(np.sin(2 * np.pi * freq * frames())) / np.pi
 
+def trapeze(freq, frames):
+	t = np.arcsin(np.sin(2 * np.pi * freq * frames()))
+	return amplitude * np.where(t > 1, 1, np.where(t < -1, -1, t))
+
 def callback(outdata, frames, t, status):
 	global start_idx, frequency, oldfreq
 	def getsounddata(freq, tfrom, tto, idx):
@@ -92,7 +96,8 @@ def helpmsg():
 '[' | ']'  : Square waveform
 '~'        : Sine waveform
 '<' | '>'  : Triangle waveform
-'/'        : Saw waveform''')
+'/'        : Saw waveform
+'='        : Trapeze waveform''')
 	print('-' * 80)
 	print("'F1'-'F12' : Piano keys: C C# D D# E F F# G G# A A# B")
 	print('-' * 80)
@@ -110,6 +115,7 @@ waveforms = {
 	1 : ['Square', square],
 	2 : ['Saw',    saw],
 	3 : ['Three',  triangle],
+	4 : ['Trapeze',trapeze],
 }
 wformnum = 0
 wave = waveforms[wformnum][1]
@@ -128,7 +134,7 @@ with sd.OutputStream(channels=channels, callback=callback, samplerate=samplerate
 					amplitude = 1
 			elif key == ord('-'):
 				amplitude /= 1.25
-			elif key in [44, 46, 47, 91, 93, 96]: 	# []~
+			elif key in [44, 46, 47, 61, 91, 93, 96]: 	# []~/=
 				if key in [91,93]:		# []
 					wformnum = 1
 				elif key in [44,46]:
@@ -137,6 +143,8 @@ with sd.OutputStream(channels=channels, callback=callback, samplerate=samplerate
 					wformnum = 0
 				elif key == 47:			# /
 					wformnum = 3
+				elif key == 61:			# =
+					wformnum = 4
 				wave = waveforms[wformnum][1]
 			elif chr(key & 0xDF) in notes.keys():
 				frequency = notes[chr(key & 0xDF)]

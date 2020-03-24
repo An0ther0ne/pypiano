@@ -9,10 +9,9 @@ Play generated wave sound with Python and Sounddevice module.
 ## Features:
 
 * Initialy octave number is 4.
-* Initialy sound frequency is 100 Hz.
 * Special algorithm for seamless frequency transition and noise reduction
 * Use callback procedure for directly calculate sound waveform
-* Sine, square, saw or triangle waveforms
+* Sine, square, saw, trapeze or triangle waveforms
 * Additional tools for watch form and spectrum audio signal
 
 ## Used keys:
@@ -32,6 +31,7 @@ Play generated wave sound with Python and Sounddevice module.
 | ~ | Sine wave form |
 | < > | Triangle waveform |
 | / | Saw waveform |
+| = | Trapeze waveform |
 
 ### Piano mapped keys:
 
