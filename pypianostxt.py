@@ -7,13 +7,15 @@ import msvcrt
 # --- globals
 
 DEBUG = True
-samplerate = 44100
-frequency  = 77.7
-oldfreq    = frequency
-amplitude  = 0.5
-channels   = 2
-start_idx  = 0
-octavenum  = 4
+samplerate  = 44100
+frequency   = 77.7
+oldfreq     = frequency
+amplitude   = 0.5
+channels    = 2
+start_idx   = 0
+octavenum   = 4
+attenuate   = True
+attenuation = False
 
 # --- notes
 
@@ -42,12 +44,33 @@ def get_piano_notes(octave):
 			pkeys[k] = baseA * 2 ** ((k - 132)/12)	
 	return pkeys
 
+def getamplitude(frames):
+	global attenuate
+	if attenuation:
+		if attenuate:
+			attenuate = False
+			amp = np.linspace(amplitude, 0, num=len(frames))
+		else:
+			amp = np.zeros((len(frames)), dtype="uint8")
+	else:
+		amp = np.linspace(amplitude, amplitude, num=len(frames))
+	return amp.reshape(-1,1)
+
 def sine(freq, frames):
-	return amplitude * np.sin(2 * np.pi * freq * frames())
+	f = frames()
+	return getamplitude(f) * np.sin(2 * np.pi * freq * f)
 	
 def square(freq, frames):
-	w = (2 * freq * frames().reshape(-1)).astype(int)
-	return np.where(w % 2 == 0, amplitude, -amplitude).reshape(-1,1)
+	f = frames()
+	amp = getamplitude(f)
+	w = (2 * freq * f).astype(int)
+	ww = w.astype(float)
+	for i,v in enumerate(w):
+		if v % 2 == 0:
+			ww[i] = amp[i]
+		else:
+			ww[i] = -amp[i]
+	return ww.reshape(-1,1)
 
 def saw(freq, frames):
 	w = (2 * freq * frames()) % 2
@@ -62,35 +85,38 @@ def trapeze(freq, frames):
 	return amplitude * np.where(t > 1, 1, np.where(t < -1, -1, t))
 
 def callback(outdata, frames, t, status):
-	global start_idx, frequency, oldfreq
+	global start_idx, frequency, oldfreq, attenuate
 	def getsounddata(freq, tfrom, tto, idx):
 		def getframes():
 			tt = (idx + np.arange(tfrom - tto)) / samplerate
 			return tt.reshape(-1, 1)
 		return wave(freq, getframes)
 	if oldfreq == frequency:
-		outdata[:] = getsounddata(frequency, frames, 0, start_idx)
+		data = getsounddata(frequency, frames, 0, start_idx)
 		start_idx = (start_idx + frames) % (samplerate / frequency)
 	else: # for seamless frequency transition and noise reduction 
 		data = getsounddata(oldfreq, frames, 0, start_idx)
+		attenuate = True
 		for i,v in enumerate(data):
 			if i > 0 and v < 0 and v > -0.01 and (v - data[i-1]) > 0:
 				start_idx = frames - i
 				data[i:] = getsounddata(frequency, frames, i, 0)
 				break
-		outdata[:] = data
 		oldfreq = frequency
+	outdata[:] = data
+	
 	
 def helpmsg():
 	print('#' * 80)
 	print('''Controll keys:
-'ESC'      : Exit")
-'+'        : Increase volume by 25%")
-'-'        : Decrease volume by 25%")
-'PgUp'     : Octave + 1")
-'PgDn'     : Octave - 1")
-'Up'       : Current frequency + 1%")
-'Down'     : Current frequency - 1%")
+'ESC'      : Exit
+'Tab'      : Toggle attenuation
+'+'        : Increase volume by 25%
+'-'        : Decrease volume by 25%
+'PgUp'     : Octave + 1
+'PgDn'     : Octave - 1
+'Up'       : Current frequency + 1%
+'Down'     : Current frequency - 1%
 'Home'     : Next waveform
 'End'	   : Previous waveform
 '[' | ']'  : Square waveform
@@ -128,6 +154,8 @@ with sd.OutputStream(channels=channels, callback=callback, samplerate=samplerate
 			key = int.from_bytes(msvcrt.getch(), 'little', signed=False)
 			if  key == 27: # ESC'
 				break
+			elif key == 9:			# Tab
+				attenuation = not attenuation
 			elif key == ord('+'):
 				amplitude *= 1.25
 				if amplitude > 1:
